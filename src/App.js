@@ -7,7 +7,10 @@ import HomePage from "./pages/homepage/Homepage";
 import ShopPage from "./pages/shoppage/ShopPage";
 import Header from "./components/header/Header";
 import SignInUp from "./pages/sign-in-and-sign-up/SignInUp";
-import { auth } from "./components/firebase/Firebase.utils";
+import {
+  auth,
+  createUserProfileDocument,
+} from "./components/firebase/Firebase.utils";
 
 class App extends Component {
   constructor() {
@@ -21,10 +24,24 @@ class App extends Component {
   unsubscribeFromAuth = null;
 
   componentDidMount() {
-    this.unsubscribeFromAuth = auth.onAuthStateChanged((user) => {
-      this.setState({ currentUser: user });
+    this.unsubscribeFromAuth = auth.onAuthStateChanged(async (userAuth) => {
+      if (userAuth) {
+        const userRef = await createUserProfileDocument(userAuth);
 
-      console.log(user);
+        userRef.onSnapshot((snapShot) => {
+          this.setState({
+            currentUser: {
+              id: snapShot.id,
+              ...snapShot.data(),
+            },
+          });
+          console.log(this.state);
+        });
+      }
+
+      //HERE If userAuth == null, that is the else statement
+
+      this.setState({ currentUser: userAuth });
     });
   }
 
