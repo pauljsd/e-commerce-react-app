@@ -35,6 +35,7 @@ class App extends Component {
               ...snapShot.data(),
             },
           });
+          // NOTICE ME there's a glitch here
           // console.log(this.state);
         });
       }
